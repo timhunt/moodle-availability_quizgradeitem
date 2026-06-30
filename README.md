@@ -5,7 +5,7 @@ This feature adds a new bulk action to the Question bank, allowing teachers and 
 Previously, exporting questions required navigating to the export interface and manually choosing categories or question sets. With this feature, users can simply select questions in the Question bank and export only those specific questions with a single action.
 
 
-## To install ##
+## To install (needed: the correct links, will follow)##
 
 Once this is published, you will be able to install it from
 Link will follow
