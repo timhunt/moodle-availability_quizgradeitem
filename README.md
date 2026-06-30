@@ -35,7 +35,7 @@ This plugin was created by Tim Hunt, Andreas Steiger and Dustin Schiele, (assist
 
 ## License ##
 
-2020 Tim Hunt, Andreas Steiger and Dustin Schiele
+2026 Tim Hunt, Andreas Steiger and Dustin Schiele
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
