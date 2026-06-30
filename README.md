@@ -54,7 +54,7 @@ This plugin can be used to implement learning pathways such as:
 
 ## Credits ##
 
-This plugin was created by Tim Hunt, Andreas Steiger Dustin Schiele and Christine Lent and Anna Kamula at #MootDACH 2026 Dev Camp.
+This plugin was created by Tim Hunt, Andreas Steiger Dustin Schiele, Christine Lent and Anna Kamula at #MootDACH 2026 Dev Camp.
 
 
 ## License ##
