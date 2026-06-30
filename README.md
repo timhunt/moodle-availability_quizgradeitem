@@ -1,8 +1,16 @@
 # Restriction by quiz part score #
 
-This availability condition allows activities and resources to be made available depending on a student's grade in a quiz.
+This availability condition allows activities and resources to be made available depending on a student's marks in a section of quiz.
 
-Teachers can create rules based on the grade achieved in a particular quiz. For example, an activity can be shown only to students who have passed a quiz, or alternatively only to students who have not yet reached a certain grade.
+Teachers can create rules based on the percentage of marks achieved in a section, or grade item*, within a particular quiz. For example, an activity can be shown only to students who passed a particular section of a quiz, or alternatively only to students who have failed in a specific section.
+
+## Note!## 
+
+"Grade item" here refers to grade items set in the Quiz activity. These grade items are not set or do not appear in the gradebook. To set up a grade item within a quiz, you:
+1. Go to the Questions tab in the Quiz you wish to edit.
+1. Select Grade items setup from the dropdown menu.
+1. Click Create Add grade item and rename if needed.
+1. Select the correct Grade item for all questions you want to add to a grade item.
 
 The condition integrates with Moodle's standard availability API and appears alongside the other restrict access conditions.
 
@@ -28,6 +36,7 @@ Then visit Admin -> Notifications to complete the installation.
 1. In the Restrict access section, select Add restriction....
 1. Choose Quiz grade.
 1. Select the quiz to use for the condition.
+1. Select the section, 
 1. Configure the grade requirement.
 1. Save the activity settings.
 
