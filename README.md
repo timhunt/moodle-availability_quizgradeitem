@@ -32,12 +32,11 @@ Then visit Admin -> Notifications to complete the installation.
 
 ## To use ##
 
-1. Turn editing on in your course.
-1. Edit the activity or resource that you want to restrict.
+1. Go to the activity or resource that you want to restrict and choose the Settings tab.
 1. In the Restrict access section, select Add restriction....
-1. Choose Quiz grade.
+1. Choose Grade.
 1. Select the quiz to use for the condition.
-1. Select the section, 
+1. Select the correct grade item.
 1. Configure the grade requirement.
 1. Save the activity settings.
 
@@ -47,9 +46,9 @@ Students will see or gain access to the activity according to the configured rul
 
 This plugin can be used to implement learning pathways such as:
 
-1. Unlocking advanced materials only after achieving a passing grade.
+1. Unlocking advanced materials only after achieving a passing grade in a specific section of a quiz.
 1. Providing additional activities for students who scored below a threshold.
-1. Releasing certificates or badges after successfully completing an assessment.
+1. Releasing certificates or badges after successfully completing a section of a quiz.
 1. Creating adaptive learning sequences based on assessment performance.
 
 ## Credits ##
