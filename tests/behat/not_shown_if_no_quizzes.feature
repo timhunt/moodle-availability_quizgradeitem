@@ -1,8 +1,8 @@
 @availability @availability_quizgradeitem
-Feature: Restriction by single quiz question only shows when relevant
+Feature: Restriction by quiz part score only shows when relevant
   In order efficiently set up my courses
   As a teacher
-  I need the single quiz question to not appear if there are no quizzes in the course
+  I need the quiz part score to not appear if there are no quizzes in the course
 
   Background:
     Given the following "courses" exist:

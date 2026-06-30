@@ -17,7 +17,7 @@
 namespace availability_quizgradeitem;
 
 /**
- * Restriction by single quiz question front-end class.
+ * Restriction by quiz part score front-end class.
  *
  * @package availability_quizgradeitem
  * @copyright 2020 Tim Hunt, Shamim Rezaie, Benjamin Schröder, Martin Hanusch, Thomas Lattner, Alex Keiller

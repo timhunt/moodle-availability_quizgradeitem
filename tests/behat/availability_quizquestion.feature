@@ -1,5 +1,5 @@
 @availability @availability_quizgradeitem
-Feature: Restriction by single quiz question
+Feature: Restriction by quiz part score
   In order provide specific resources based on detailed quiz performance
   As a teacher
   I need to set conditions for student access based on the result of individual quiz questions

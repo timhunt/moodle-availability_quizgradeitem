@@ -1,11 +1,11 @@
-# Bulk Export of Questions to Moodle XML #
+# Restriction by quiz part score #
 
 This feature adds a new bulk action to the Question bank, allowing teachers and managers to export multiple selected questions directly in Moodle XML format.
 
 Previously, exporting questions required navigating to the export interface and manually choosing categories or question sets. With this feature, users can simply select questions in the Question bank and export only those specific questions with a single action.
 
 
-## To install (needed: the correct links, will follow)##
+## To install ##
 
 Once this is published, you will be able to install it from
 Link will follow
@@ -21,16 +21,11 @@ Then visit Admin -> Notifications to complete the installation.
 
 ## To use ##
 
-1. Go to Question bank.
-1. Select one or more questions using the checkboxes.
-1. From the Bulk actions menu, choose Export selected questions as Moodle XML.
-1. The selected questions will be exported and downloaded as a standard Moodle XML file.
-
 
 
 ## Credits ##
 
-This plugin was created by Tim Hunt, Andreas Steiger and Dustin Schiele, (assisted by Christine Lent) at #MootDACH 2026 Dev Camp.
+This plugin was created by Tim Hunt, Andreas Steiger Dustin Schiele, and Christine Lent at #MootDACH 2026 Dev Camp.
 
 
 ## License ##

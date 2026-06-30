@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Restriction by single quiz question privacy subsystem implementation.
+ * Restriction by quiz part score privacy subsystem implementation.
  *
  * @package   availability_quizgradeitem
  * @copyright 2020 Tim Hunt, Shamim Rezaie, Benjamin Schröder, Martin Hanusch, Thomas Lattner, Alex Keiller
@@ -25,7 +25,7 @@
 namespace availability_quizgradeitem\privacy;
 
 /**
- * Restriction by single quiz question privacy subsystem implementation.
+ * Restriction by quiz part score privacy subsystem implementation.
  */
 class provider implements \core_privacy\local\metadata\null_provider {
     public static function get_reason() : string {

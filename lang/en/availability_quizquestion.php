@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Restriction by single quiz question language strings.
+ * Restriction by quiz part score language strings.
  *
  * @package   availability_quizgradeitem
  * @category  string
@@ -32,8 +32,8 @@ $string['error_selectquestion'] = 'You must select a question.';
 $string['error_selectstate'] = 'You must select a state.';
 $string['label_state'] = 'Required state';
 $string['label_question'] = 'Which question in the selected quiz';
-$string['pluginname'] = 'Restriction by single quiz question';
-$string['privacy:metadata'] = 'The Restriction by single quiz question plugin does not store any personal data.';
+$string['pluginname'] = 'Restriction by quiz part score';
+$string['privacy:metadata'] = 'The Restriction by quiz part score plugin does not store any personal data.';
 $string['questionnumberandname'] = 'Q{$a->number}) {$a->name}';
 $string['title'] = 'Quiz question';
 $string['requires_quizquestion'] = 'The question <b>{$a->questiontext}</b> in <b><a href="{$a->quizurl}">{$a->quizname}</a></b> is <b>{$a->requiredstate}</b>';

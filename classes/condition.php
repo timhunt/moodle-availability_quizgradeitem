@@ -23,7 +23,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/questionlib.php');
 
 /**
- * Restriction by single quiz question condition main class.
+ * Restriction by quiz part score condition main class.
  *
  * @package availability_quizgradeitem
  * @copyright 2020 Tim Hunt, Shamim Rezaie, Benjamin Schröder, Martin Hanusch, Thomas Lattner, Alex Keiller
