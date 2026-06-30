@@ -4,6 +4,8 @@ This availability condition allows activities and resources to be made available
 
 Teachers can create rules based on the percentage of marks achieved in a section, or grade item*, within a particular quiz. For example, an activity can be shown only to students who passed a particular section of a quiz, or alternatively only to students who have failed in a specific section.
 
+The condition integrates with Moodle's standard availability API and appears alongside the other restrict access conditions.
+
 ## Note! ## 
 
 "Grade item" here refers to grade items set in the Quiz activity. These grade items are not set or do not appear in the gradebook. To set up a grade item within a quiz, you:
@@ -12,7 +14,6 @@ Teachers can create rules based on the percentage of marks achieved in a section
 1. Click Add grade item and rename if needed.
 1. Select the correct Grade item for all questions you want to add to a grade item.
 
-The condition integrates with Moodle's standard availability API and appears alongside the other restrict access conditions.
 
 
 ## To install ##
