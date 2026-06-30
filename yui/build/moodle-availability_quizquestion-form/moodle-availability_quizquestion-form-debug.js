@@ -1,0 +1,179 @@
+YUI.add('moodle-availability_quizgradeitem-form', function (Y, NAME) {
+
+// eslint-disable-next-line camelcase
+M.availability_quizgradeitem = M.availability_quizgradeitem || {};
+
+M.availability_quizgradeitem.form = Y.Object(M.core_availability.plugin);
+
+/**
+ * Quizzes available for selection (alphabetical order).
+ *
+ * @property quizzes
+ * @type Array
+ */
+
+M.availability_quizgradeitem.form.quizzes = null;
+
+/**
+ * States available for selection.
+ *
+ * @property states
+ * @type Array
+ */
+M.availability_quizgradeitem.form.states = null;
+
+/**
+ * Initialises this plugin.
+ *
+ * @method initInner
+ * @param {Array} quizzes Array of objects containing quiz .id and .name
+ * @param {Array} states Array of objects containing state .shortname and .displayname
+ */
+M.availability_quizgradeitem.form.initInner = function(quizzes, states) {
+    this.quizzes = quizzes;
+    this.states = states;
+};
+
+M.availability_quizgradeitem.form.getNode = function(json) {
+    var i;
+
+    // Create HTML structure.
+    var html = '<span class="availability-group">';
+    html += '<label><span class="p-r-1">' + M.util.get_string('title', 'availability_quizgradeitem') + '</span> ' +
+            '<select name="quizid" class="custom-select">' +
+            '<option value="">' + M.util.get_string('choosedots', 'moodle') + '</option>';
+    for (i = 0; i < this.quizzes.length; i++) {
+        // String has already been escaped using format_string.
+        html += '<option value="' + this.quizzes[i].id + '">' + this.quizzes[i].name + '</option>';
+    }
+    html += '</select></label>';
+
+    html += ' <label><span class="sr-only">' + M.util.get_string('label_question', 'availability_quizgradeitem') + '</span>' +
+            '<select name="questionbankentryid" class="custom-select">' +
+            '<option value="">' + M.util.get_string('choosedots', 'moodle') + '</option>';
+    html += '</select></label>';
+
+    html += ' <label><span class="sr-only">' + M.util.get_string('label_state', 'availability_quizgradeitem') + '</span>' +
+            '<select name="requiredstate" class="custom-select">' +
+            '<option value="">' + M.util.get_string('choosedots', 'moodle') + '</option>';
+    for (i = 0; i < this.states.length; i++) {
+        html += '<option value="' + this.states[i].shortname + '">' + this.states[i].displayname + '</option>';
+    }
+    html += '</select></label>';
+
+    html += '</span>';
+
+    var node = Y.Node.create('<span class="form-inline">' + html + '</span>');
+
+    var updateQuestions = function(quizNode, questionNode, callback) {
+        var quizId = quizNode.get('value');
+        var url = M.cfg.wwwroot + '/availability/condition/quizquestion/ajax.php?quizid=' + quizId;
+        // First, remove all options except the first one from the question drop-down menu.
+        questionNode.all('option').each(function(optionNode) {
+            if (optionNode.get('value') !== '') {
+                optionNode.remove();
+            }
+        }, this);
+
+        if (quizId) {
+            // Disable the quiz element until we finish loading it's questions.
+            quizNode.set('disabled', true);
+            var pendingKey = {};
+            M.util.js_pending(pendingKey);
+            Y.io(url, {
+                on: {
+                    success: function(id, response) {
+                        var questions = Y.JSON.parse(response.responseText);
+                        for (var i = 0; i < questions.length; i++) {
+                            var questionOption = document.createElement('option');
+                            questionOption.value = questions[i].id;
+                            questionOption.innerHTML = questions[i].name;
+                            questionNode.append(questionOption);
+                        }
+                        // Questions are loaded, so we enable the quiz element now.
+                        quizNode.set('disabled', false);
+
+                        if (callback !== undefined) {
+                            callback();
+                        }
+
+                        M.core_availability.form.update();
+                        M.util.js_complete(pendingKey);
+                    },
+                    failure: function(id, response) {
+                        // Loading failed. Let's enable the quiz so the user can try again.
+                        quizNode.set('disabled', false);
+                        M.util.js_complete(pendingKey);
+
+                        var debugInfo = response.statusText;
+                        if (M.cfg.developerdebug) {
+                            debugInfo += ' (' + url + ')';
+                        }
+                        new M.core.exception({message: debugInfo});
+                    }
+                }
+            });
+        }
+    };
+
+    // Set initial value if specified.
+    if (json.quizid !== undefined &&
+            node.one('select[name=quizid] > option[value=' + json.quizid + ']')) {
+        node.one('select[name=quizid]').set('value', '' + json.quizid);
+        updateQuestions(node.one('select[name=quizid]'), node.one('select[name=questionbankentryid]'), function() {
+            if (json.questionbankentryid !== undefined &&
+                node.one('select[name=questionbankentryid] > option[value=' + json.questionbankentryid + ']')) {
+                node.one('select[name=questionbankentryid]').set('value', '' + json.questionbankentryid);
+            }
+        });
+    }
+    if (json.requiredstate !== undefined &&
+            node.one('select[name=requiredstate] > option[value=' + json.requiredstate + ']')) {
+        node.one('select[name=requiredstate]').set('value', '' + json.requiredstate);
+    }
+
+    // Add event handlers (first time only).
+    if (!M.availability_quizgradeitem.form.addedEvents) {
+        M.availability_quizgradeitem.form.addedEvents = true;
+        var root = Y.one('.availability-field');
+        root.delegate('change', function() {
+            M.core_availability.form.update();
+        }, '.availability_quizgradeitem select');
+        root.delegate('change', function() {
+            var ancestorNode = this.ancestor('span.availability_quizgradeitem');
+            var quizNode = ancestorNode.one('select[name=quizid]');
+            var questionNode = ancestorNode.one('select[name=questionbankentryid]');
+            updateQuestions(quizNode, questionNode);
+        }, '.availability_quizgradeitem select[name=quizid]');
+    }
+
+    return node;
+};
+
+M.availability_quizgradeitem.form.fillValue = function(value, node) {
+    var quizid = node.one('select[name=quizid]').get('value');
+    var questionbankentryid = node.one('select[name=questionbankentryid]').get('value');
+    var state = node.one('select[name=requiredstate]').get('value');
+
+    value.quizid = quizid === '' ? '' : parseInt(quizid, 10);
+    value.questionbankentryid = questionbankentryid === '' ? '' : parseInt(questionbankentryid, 10);
+    value.requiredstate = state;
+};
+
+M.availability_quizgradeitem.form.fillErrors = function(errors, node) {
+    var value = {};
+    this.fillValue(value, node);
+
+    if (value.quizid === '') {
+        errors.push('availability_quizgradeitem:error_selectquiz');
+    }
+    if (value.questionbankentryid === '') {
+        errors.push('availability_quizgradeitem:error_selectquestion');
+    }
+    if (value.requiredstate === '') {
+        errors.push('availability_quizgradeitem:error_selectstate');
+    }
+};
+
+
+}, '@VERSION@', {"requires": ["base", "node", "event", "moodle-core_availability-form"]});
