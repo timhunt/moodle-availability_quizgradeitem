@@ -83,25 +83,52 @@ class condition extends \core_availability\condition {
 
         if ($this->min === null && $this->max === null) {
             throw new \coding_exception('Either ->min or ->max must be set for a quizgradeitem condition.');
-
         }
     }
 
+    #[\Override]
     public function save(): \stdClass {
-        $this->update_question_id_to_question_bank_entry_id_if_required();
-        return self::get_json($this->quizid, $this->questionbankentryid, $this->requiredstate);
+        return self::get_json(
+            $this->quizid,
+            $this->quizgradeitemid,
+            $this->min,
+            $this->max,
+        );
     }
 
-    public static function get_json(int $quizid, int $questionbankentryid,
-            \question_state $requiredstate): \stdClass {
-        return (object)[
-            'type' => 'quizquestion',
+    /**
+     * Returns a JSON object which corresponds to a condition of this type.
+     *
+     * Intended for unit testing, as normally the JSON values are constructed
+     * by JavaScript code.
+     *
+     * @param int $quizid id of the quiz we are depending on.
+     * @param int $quizgradeitemid id of the quiz grade item we are depending on.
+     * @param float|null $min min grade (or null if no min).
+     * @param float|null $max max grade (or null if no max).
+     * @return \stdClass Object representing condition.
+     */
+    public static function get_json(
+        int $quizid,
+        int $quizgradeitemid,
+        ?float $min,
+        ?float $max,
+    ): \stdClass {
+        $config = (object)[
+            'type' => 'quizgradeitem',
             'quizid' => $quizid,
-            'questionbankentryid' => $questionbankentryid,
-            'requiredstate' => (string) $requiredstate
+            'quizgradeitemid' => $quizgradeitemid,
         ];
+        if ($min !== null) {
+            $config->min = $min;
+        }
+        if ($max !== null) {
+            $config->max = $max;
+        }
+        return $config;
     }
 
+    #[\Override]
     protected function get_debug_string(): string {
         return " quiz: #$this->quizid, quizgradeitemid: #$this->quizgradeitemid" .
             ($this->min !== null ? ", min: $this->min" : '') .
@@ -109,7 +136,6 @@ class condition extends \core_availability\condition {
     }
 
     public function is_available($not, \core_availability\info $info, $grabthelot, $userid): bool {
-
         $allow = $this->requirements_fulfilled($userid);
 
         if ($not) {

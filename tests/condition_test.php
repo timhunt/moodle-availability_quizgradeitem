@@ -22,9 +22,8 @@ namespace availability_quizgradeitem;
  * @package availability_quizgradeitem
  * @copyright 2026 Tim Hunt, Dustin Schiele, Andreas Steiger and Christine Lent
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers \availability_quizgradeitem\condition
  */
-#[\Covers]
+#[\PHPUnit\Framework\Attributes\CoversClass(condition::class)]
 class condition_test extends \advanced_testcase {
     public function test_constructor_min_only() {
         $cond = new condition((object) [
@@ -75,15 +74,9 @@ class condition_test extends \advanced_testcase {
                 'quizid' => 123, 'quizgradeitemid' => 'wrong', 'min' => 2]);
     }
 
-    public function xtest_constructor_invalid_questionid() {
-        $this->expectExceptionMessage('Invalid questionid for quizquestion condition');
-        new condition((object) [
-                'quizid' => 123, 'questionid' => 'wrong', 'requiredstate' => 'gradedwrong']);
-    }
-
     public function test_constructor_invalid_min() {
         $this->expectExceptionMessage('Invalid ->min for quizgradeitem condition.');
-        $cond = new condition((object) [
+        new condition((object) [
             'quizid' => 123,
             'quizgradeitemid' => 456,
             'min' => 'wrong',
@@ -108,16 +101,38 @@ class condition_test extends \advanced_testcase {
             'quizgradeitemid' => 456,
         ]);
     }
-    public function xtest_constructor_invalid_state() {
-        $this->expectExceptionMessage('Invalid requiredstate for quizquestion condition');
-        new condition((object) [
-                'quizid' => 123, 'questionbankentryid' => 456, 'requiredstate' => 'todo']);
+
+    public function test_save_min_only() {
+        $structure = (object) [
+            'quizid' => 123,
+            'quizgradeitemid' => 456,
+            'min' => 2,
+        ];
+        $cond = new condition($structure);
+        $structure->type = 'quizgradeitem';
+        $this->assertEquals($structure, $cond->save());
     }
 
-    public function xtest_save() {
-        $structure = (object) ['quizid' => 123, 'questionbankentryid' => 456, 'requiredstate' => 'gradedwrong'];
+    public function test_save_max_only() {
+        $structure = (object) [
+            'quizid' => 123,
+            'quizgradeitemid' => 456,
+            'max' => 3.14,
+        ];
         $cond = new condition($structure);
-        $structure->type = 'quizquestion';
+        $structure->type = 'quizgradeitem';
+        $this->assertEquals($structure, $cond->save());
+    }
+
+    public function test_save_range() {
+        $structure = (object) [
+            'quizid' => 123,
+            'quizgradeitemid' => 456,
+            'min' => 2,
+            'max' => 3.14,
+        ];
+        $cond = new condition($structure);
+        $structure->type = 'quizgradeitem';
         $this->assertEquals($structure, $cond->save());
     }
 
