@@ -54,7 +54,7 @@ class condition_test extends \advanced_testcase {
         $cond = new condition((object) [
             'quizid' => 123,
             'quizgradeitemid' => 456,
-            'min' => 2.0,
+            'min' => 2,
             'max' => 3.14,
         ]);
         $this->assertEquals(
@@ -63,16 +63,16 @@ class condition_test extends \advanced_testcase {
         );
     }
 
-    public function xtest_constructor_invalid_quizid() {
-        $this->expectExceptionMessage('Invalid quizid for quizquestion condition');
+    public function test_constructor_invalid_quizid() {
+        $this->expectExceptionMessage('Invalid quizid for quizgradeitem condition.');
         new condition((object) [
-                'quizid' => 'wrong', 'questionbankentryid' => 456, 'requiredstate' => 'gradedwrong']);
+                'quizid' => 'wrong', 'quizgradeitemid' => 456, 'min' => 2]);
     }
 
-    public function xtest_constructor_invalid_questionbankentryid() {
-        $this->expectExceptionMessage('Invalid questionbankentryid for quizquestion condition');
+    public function test_constructor_invalid_quizgradeitemid() {
+        $this->expectExceptionMessage('Invalid quizgradeitemid for quizgradeitem condition.');
         new condition((object) [
-                'quizid' => 123, 'questionbankentryid' => 'wrong', 'requiredstate' => 'gradedwrong']);
+                'quizid' => 123, 'quizgradeitemid' => 'wrong', 'min' => 2]);
     }
 
     public function xtest_constructor_invalid_questionid() {
@@ -81,6 +81,33 @@ class condition_test extends \advanced_testcase {
                 'quizid' => 123, 'questionid' => 'wrong', 'requiredstate' => 'gradedwrong']);
     }
 
+    public function test_constructor_invalid_min() {
+        $this->expectExceptionMessage('Invalid ->min for quizgradeitem condition.');
+        $cond = new condition((object) [
+            'quizid' => 123,
+            'quizgradeitemid' => 456,
+            'min' => 'wrong',
+            'max' => 3.14,
+        ]);
+    }
+
+    public function test_constructor_invalid_max() {
+        $this->expectExceptionMessage('Invalid ->max for quizgradeitem condition.');
+        new condition((object) [
+            'quizid' => 123,
+            'quizgradeitemid' => 456,
+            'min' => 2,
+            'max' => 'wrong',
+        ]);
+    }
+
+    public function test_constructor_no_range() {
+        $this->expectExceptionMessage('Either ->min or ->max must be set for a quizgradeitem condition.');
+        new condition((object) [
+            'quizid' => 123,
+            'quizgradeitemid' => 456,
+        ]);
+    }
     public function xtest_constructor_invalid_state() {
         $this->expectExceptionMessage('Invalid requiredstate for quizquestion condition');
         new condition((object) [

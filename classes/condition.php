@@ -62,7 +62,7 @@ class condition extends \core_availability\condition {
         if (isset($structure->quizgradeitemid) && is_int($structure->quizgradeitemid)) {
             $this->quizgradeitemid = $structure->quizgradeitemid;
         } else {
-            throw new \coding_exception('Invalid quizgradeitemid for quizquestion condition.');
+            throw new \coding_exception('Invalid quizgradeitemid for quizgradeitem condition.');
         }
 
         // Get min and max.
@@ -71,18 +71,18 @@ class condition extends \core_availability\condition {
         } else if (is_float($structure->min) || is_int($structure->min)) {
             $this->min = $structure->min;
         } else {
-            throw new \coding_exception('Missing or invalid ->min for quizquestion condition.');
+            throw new \coding_exception('Invalid ->min for quizgradeitem condition.');
         }
         if (!property_exists($structure, 'max')) {
             $this->max = null;
         } else if (is_float($structure->max) || is_int($structure->max)) {
             $this->max = $structure->max;
         } else {
-            throw new \coding_exception('Missing or invalid ->max for quizquestion condition.');
+            throw new \coding_exception('Invalid ->max for quizgradeitem condition.');
         }
 
         if ($this->min === null && $this->max === null) {
-            throw new \coding_exception('Either ->min or ->max must be set for a quizquestion condition.');
+            throw new \coding_exception('Either ->min or ->max must be set for a quizgradeitem condition.');
 
         }
     }
