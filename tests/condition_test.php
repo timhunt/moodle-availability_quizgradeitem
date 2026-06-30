@@ -24,27 +24,43 @@ namespace availability_quizgradeitem;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \availability_quizgradeitem\condition
  */
+#[\Covers]
 class condition_test extends \advanced_testcase {
-    /**
-     * Load required classes.
-     */
-    public function setUp(): void {
-        // Load the mock info class so that it can be used.
-        global $CFG;
-        parent::setUp();
-        require_once($CFG->dirroot . '/availability/tests/fixtures/mock_info.php');
+    public function test_constructor_min_only() {
+        $cond = new condition((object) [
+            'quizid' => 123,
+            'quizgradeitemid' => 456,
+            'min' => '2.0',
+        ]);
+        $this->assertEquals(
+            '{quizquestion: quiz: #123, quizgradeitemid: #456, min: 2.0}',
+            (string) $cond,
+        );
     }
 
-    public function test_constructor_working_case() {
+    public function test_constructor_max_only() {
         $cond = new condition((object) [
-                'quizid' => 123, 'questionbankentryid' => 456, 'requiredstate' => 'gradedwrong']);
-        $this->assertEquals('{quizquestion: quiz:#123, questionbankentry:#456, gradedwrong}', (string) $cond);
+            'quizid' => 123,
+            'quizgradeitemid' => 456,
+            'max' => '3.14',
+        ]);
+        $this->assertEquals(
+            '{quizquestion: quiz: #123, quizgradeitemid: #456, max: 3.14}',
+            (string) $cond,
+        );
     }
 
-    public function test_constructor_legacy_case() {
+    public function test_constructor_range() {
         $cond = new condition((object) [
-                'quizid' => 123, 'questionid' => 456, 'requiredstate' => 'gradedwrong']);
-        $this->assertEquals('{quizquestion: quiz:#123, question:#456, gradedwrong}', (string) $cond);
+            'quizid' => 123,
+            'quizgradeitemid' => 456,
+            'min' => '2.0',
+            'max' => '3.14',
+        ]);
+        $this->assertEquals(
+            '{quizquestion: quiz: #123, quizgradeitemid: #456, min: 2.0, max: 3.14}',
+            (string) $cond,
+        );
     }
 
     public function test_constructor_invalid_quizid() {

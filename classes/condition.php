@@ -16,87 +16,75 @@
 
 namespace availability_quizgradeitem;
 
-use core_question\local\bank\question_version_status;
-
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->libdir . '/questionlib.php');
-
 /**
  * Restriction by quiz part score condition main class.
+ *
+ * The configuration for this plugin is this JSON structure:
+ * {
+ *     "quizid": 123, -- the id of the quiz this depends on.
+ *     "gradeitemid": 4567 -- the id of a quiz_grade_item in that quiz this depends on.
+ *     "min": 2.0 -- optional, lowest accepted grade (>=)
+ *     "max": 7.2 -- optional, highest accepted grade (<)
+ * }
+ * at least one of min and max must be set.
  *
  * @package availability_quizgradeitem
  * @copyright 2026 Tim Hunt, Dustin Schiele, Andreas Steiger and Christine Lent
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class condition extends \core_availability\condition {
-    /** @var array these are the types of state we recognise. */
-    const STATES_USED = ['gradedright', 'gradedpartial', 'gradedwrong'];
-
     /** @var int the id of the quiz this depends on. */
     protected $quizid;
 
     /** @var int the id of the question bank entry in the quiz that this depends on. */
-    protected $questionbankentryid;
+    protected $quizgradeitemid;
 
-    /**
-     * @var int the id of the question in the quiz that this depends on in legacy data.
-     *
-     * This is only used when restoring backups or as part of updating old data.
-     * It gets updated by {@lins update_question_id_to_question_bank_entry_id_if_required()}
-     * before use, but because of how backup works, that cannot be done in the constructor.
-     */
-    protected $questionid;
+    /** @var float|null the minimum grade (must be >= this) or null if none. */
+    protected ?float $min;
 
-    /** @var \question_state the state the target question must be in. */
-    protected $requiredstate;
+    /** @var float|null the maximum grade (must be < this) or null if none. */
+    protected ?float $max;
 
     /**
      * Constructor.
      *
-     * @param \stdClass $structure Data structure from JSON decode
+     * @param \stdClass $structure Data structure from JSON decode (as in class comment).
      * @throws \coding_exception If invalid data structure.
      */
-    public function __construct($structure) {
+    public function __construct(\stdClass $structure) {
 
         if (isset($structure->quizid) && is_int($structure->quizid)) {
             $this->quizid = $structure->quizid;
         } else {
-            throw new \coding_exception('Invalid quizid for quizquestion condition');
+            throw new \coding_exception('Invalid quizid for quizgradeitem condition.');
         }
 
-        if (isset($structure->questionbankentryid)) {
-            // Might not be set if this is old data from before 4.0.
-            if (is_int($structure->questionbankentryid)) {
-                $this->questionbankentryid = $structure->questionbankentryid;
-            } else {
-                throw new \coding_exception('Invalid questionbankentryid for quizquestion condition');
-            }
+        if (isset($structure->quizgradeitemid) && is_int($structure->quizgradeitemid)) {
+            $this->quizgradeitemid = $structure->quizgradeitemid;
+        } else {
+            throw new \coding_exception('Invalid quizgradeitemid for quizquestion condition.');
         }
 
-        if (isset($structure->questionid)) {
-            // This is an old backup, but we can't update it yet, because of how backup works.
-            if (is_int($structure->questionid)) {
-                $this->questionid = $structure->questionid;
-            } else {
-                throw new \coding_exception('Invalid questionid for quizquestion condition');
-            }
+        // Get min and max.
+        if (!property_exists($structure, 'min')) {
+            $this->min = null;
+        } else if (is_float($structure->min) || is_int($structure->min)) {
+            $this->min = $structure->min;
+        } else {
+            throw new \coding_exception('Missing or invalid ->min for quizquestion condition.');
+        }
+        if (!property_exists($structure, 'max')) {
+            $this->max = null;
+        } else if (is_float($structure->max) || is_int($structure->max)) {
+            $this->max = $structure->max;
+        } else {
+            throw new \coding_exception('Missing or invalid ->max for quizquestion condition.');
         }
 
-        if (!isset($structure->questionbankentryid) && !isset($structure->questionid)) {
-            throw new \coding_exception('One of questionbankentryid or questionid must be set for quizquestion condition');
-        }
+        if ($this->min === null && $this->max === null) {
+            throw new \coding_exception('Either ->min or ->max must be set for a quizquestion condition.');
 
-        if (isset($structure->requiredstate)) {
-            $state = \question_state::get($structure->requiredstate);
-            if ($state && in_array((string) $state, self::STATES_USED)) {
-                $this->requiredstate = $state;
-            }
         }
-        if (!isset($this->requiredstate)) {
-            throw new \coding_exception('Invalid requiredstate for quizquestion condition');
-        }
-
     }
 
     public function save(): \stdClass {
@@ -115,12 +103,9 @@ class condition extends \core_availability\condition {
     }
 
     protected function get_debug_string(): string {
-        if ($this->questionbankentryid) {
-            return " quiz:#$this->quizid, questionbankentry:#$this->questionbankentryid, $this->requiredstate";
-        } else {
-            // Legacy case.
-            return " quiz:#$this->quizid, question:#$this->questionid, $this->requiredstate";
-        }
+        return " quiz: #$this->quizid, quizgradeitemid: #$this->quizgradeitemid" .
+            ($this->min !== null ? ", min: $this->min" : '') .
+            ($this->max !== null ? ", max: $this->max" : '');
     }
 
     public function is_available($not, \core_availability\info $info, $grabthelot, $userid): bool {

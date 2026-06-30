@@ -25,16 +25,17 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['ajaxerror'] = 'Error contacting server to obtain quiz questions';
-$string['description'] = 'This plugin allows you to limit access to another Moodle activity based just on the outcome of a single question in a quiz.';
+$string['description'] = 'This plugin allows you to limit access to another Moodle activity based just on the score a student got for just some of the sections in a quiz.';
+$string['error_backwardrange'] = 'When specifying a grade range, the minimum must be lower than the maximum.';
+$string['error_selectgradeitem'] = 'You must select a quiz grade item.';
 $string['error_selectquiz'] = 'You must select a quiz.';
-$string['error_selectquestion'] = 'You must select a question.';
-$string['error_selectstate'] = 'You must select a state.';
-$string['label_state'] = 'Required state';
-$string['label_question'] = 'Which question in the selected quiz';
+$string['label_gradeitem'] = 'Which part grade';
+$string['label_max'] = 'Maximum grade percentage (exclusive)';
+$string['label_min'] = 'Minimum grade percentage (inclusive)';
+$string['option_max'] = 'must be <';
+$string['option_min'] = 'must be ≥';
 $string['pluginname'] = 'Restriction by quiz part score';
 $string['privacy:metadata'] = 'The Restriction by quiz part score plugin does not store any personal data.';
-$string['questionnumberandname'] = 'Q{$a->number}) {$a->name}';
-$string['title'] = 'Quiz question';
-$string['requires_quizquestion'] = 'The question <b>{$a->questiontext}</b> in <b><a href="{$a->quizurl}">{$a->quizname}</a></b> is <b>{$a->requiredstate}</b>';
-$string['requires_quizquestionnot'] = 'The question <b>{$a->questiontext}</b> in <b><a href="{$a->quizurl}">{$a->quizname}</a></b> is not <b>{$a->requiredstate}</b>';
+$string['requires_quizgradeitem'] = 'The <b>{$a->gradeitemname}</b> grade in <b><a href="{$a->quizurl}">{$a->quizname}</a></b> is <b>{$a->rangedescription}</b>';
+$string['requires_quizgradeitemnot'] = 'The question <b>{$a->gradeitemname}</b> in <b><a href="{$a->quizurl}">{$a->quizname}</a></b> is not <b>{$a->rangedescription}</b>';
+$string['title'] = 'Quiz part grade';
