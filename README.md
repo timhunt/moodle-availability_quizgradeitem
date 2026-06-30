@@ -1,8 +1,10 @@
 # Restriction by quiz part score #
 
-This feature adds a new bulk action to the Question bank, allowing teachers and managers to export multiple selected questions directly in Moodle XML format.
+This availability condition allows activities and resources to be made available depending on a student's grade in a quiz.
 
-Previously, exporting questions required navigating to the export interface and manually choosing categories or question sets. With this feature, users can simply select questions in the Question bank and export only those specific questions with a single action.
+Teachers can create rules based on the grade achieved in a particular quiz. For example, an activity can be shown only to students who have passed a quiz, or alternatively only to students who have not yet reached a certain grade.
+
+The condition integrates with Moodle's standard availability API and appears alongside the other restrict access conditions.
 
 
 ## To install ##
@@ -21,11 +23,28 @@ Then visit Admin -> Notifications to complete the installation.
 
 ## To use ##
 
+1. Turn editing on in your course.
+1. Edit the activity or resource that you want to restrict.
+1. In the Restrict access section, select Add restriction....
+1. Choose Quiz grade.
+1. Select the quiz to use for the condition.
+1. Configure the grade requirement.
+1. Save the activity settings.
 
+Students will see or gain access to the activity according to the configured rule and their current grade in the selected quiz.
+
+## Example use case ##
+
+This plugin can be used to implement learning pathways such as:
+
+1. Unlocking advanced materials only after achieving a passing grade.
+1. Providing additional activities for students who scored below a threshold.
+1. Releasing certificates or badges after successfully completing an assessment.
+1. Creating adaptive learning sequences based on assessment performance.
 
 ## Credits ##
 
-This plugin was created by Tim Hunt, Andreas Steiger Dustin Schiele, and Christine Lent at #MootDACH 2026 Dev Camp.
+This plugin was created by Tim Hunt, Andreas Steiger Dustin Schiele and Christine Lent at #MootDACH 2026 Dev Camp.
 
 
 ## License ##
