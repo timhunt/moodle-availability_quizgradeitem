@@ -9,7 +9,7 @@ Teachers can create rules based on the percentage of marks achieved in a section
 "Grade item" here refers to grade items set in the Quiz activity. These grade items are not set or do not appear in the gradebook. To set up a grade item within a quiz, you:
 1. Go to the Questions tab in the Quiz you wish to edit.
 1. Select Grade items setup from the dropdown menu.
-1. Click Create Add grade item and rename if needed.
+1. Click Add grade item and rename if needed.
 1. Select the correct Grade item for all questions you want to add to a grade item.
 
 The condition integrates with Moodle's standard availability API and appears alongside the other restrict access conditions.
