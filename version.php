@@ -18,14 +18,14 @@
  * Restriction by quiz part score version information.
  *
  * @package   availability_quizgradeitem
- * @copyright 2020 Tim Hunt, Shamim Rezaie, Benjamin Schröder, Martin Hanusch, Thomas Lattner, Alex Keiller
+ * @copyright 2026 Tim Hunt, Dustin Schiele, Andreas Steiger and Christine Lent
  * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2022092000;
-$plugin->requires = 2022041900;
+$plugin->version = 2026063000;
+$plugin->requires = 2025041400;
 $plugin->component = 'availability_quizgradeitem';
-$plugin->release = 'v1.3 for Moodle 4.0+';
-$plugin->maturity = MATURITY_STABLE;
+$plugin->release = 'v0.9 for Moodle 5.0+';
+$plugin->maturity = MATURITY_BETA;

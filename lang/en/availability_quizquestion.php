@@ -19,7 +19,7 @@
  *
  * @package   availability_quizgradeitem
  * @category  string
- * @copyright 2020 Tim Hunt, Shamim Rezaie, Benjamin Schröder, Martin Hanusch, Thomas Lattner, Alex Keiller
+ * @copyright 2026 Tim Hunt, Dustin Schiele, Andreas Steiger and Christine Lent
  * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

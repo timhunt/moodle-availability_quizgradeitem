@@ -30,7 +30,7 @@ if ($CFG->release < 4.2) {
  * Helper class to get the list of question options to show on the settings form.
  *
  * @package availability_quizgradeitem
- * @copyright 2020 Tim Hunt, Shamim Rezaie, Benjamin Schröder, Martin Hanusch, Thomas Lattner, Alex Keiller
+ * @copyright 2026 Tim Hunt, Dustin Schiele, Andreas Steiger and Christine Lent
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class question_list_fetcher {

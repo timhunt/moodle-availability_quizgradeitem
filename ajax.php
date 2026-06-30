@@ -18,7 +18,7 @@
  * Handles AJAX requests to get the list of questions in a quiz.
  *
  * @package   availability_quizgradeitem
- * @copyright 2020 Tim Hunt, Shamim Rezaie, Benjamin Schröder, Martin Hanusch, Thomas Lattner, Alex Keiller
+ * @copyright 2026 Tim Hunt, Dustin Schiele, Andreas Steiger and Christine Lent
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
