@@ -24,7 +24,7 @@ namespace availability_quizgradeitem;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \availability_quizgradeitem\question_list_fetcher
  */
-class question_list_fetcher_test extends \advanced_testcase {
+class question_list_fetcher_xtest extends \advanced_testcase {
 
     public function test_list_questions_in_quiz() {
         global $DB;

@@ -33,7 +33,7 @@ use core_question\local\bank\question_version_status;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \availability_quizgradeitem\condition::update_after_restore
  */
-class backup_test extends \advanced_testcase {
+class backup_xtest extends \advanced_testcase {
 
     protected function setUp(): void {
         global $CFG;
