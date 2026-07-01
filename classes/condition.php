@@ -34,10 +34,10 @@ namespace availability_quizgradeitem;
  */
 class condition extends \core_availability\condition {
     /** @var int the id of the quiz this depends on. */
-    protected $quizid;
+    protected int $quizid;
 
     /** @var int the id of the question bank entry in the quiz that this depends on. */
-    protected $quizgradeitemid;
+    protected int $quizgradeitemid;
 
     /** @var float|null the minimum grade (must be >= this) or null if none. */
     protected ?float $min;
@@ -52,7 +52,6 @@ class condition extends \core_availability\condition {
      * @throws \coding_exception If invalid data structure.
      */
     public function __construct(\stdClass $structure) {
-
         if (isset($structure->quizid) && is_int($structure->quizid)) {
             $this->quizid = $structure->quizid;
         } else {
@@ -135,8 +134,17 @@ class condition extends \core_availability\condition {
             ($this->max !== null ? ", max: $this->max" : '');
     }
 
+    #[\Override]
     public function is_available($not, \core_availability\info $info, $grabthelot, $userid): bool {
-        $allow = $this->requirements_fulfilled($userid);
+        $score = $this->get_cached_quiz_grade_item_score(
+            $userid,
+            $this->quizgradeitemid,
+            $this->quizid,
+        );
+
+        $allow = $score !== false &&
+            ($this->min === null || $score >= $this->min) &&
+            ($this->max === null || $score < $this->max);
 
         if ($not) {
             $allow = !$allow;
@@ -145,143 +153,235 @@ class condition extends \core_availability\condition {
         return $allow;
     }
 
-    /**
-     * Determine if the target question is in the expected state.
-     *
-     * @param int $userid id of the user we are checking for.
-     * @return bool true if the question is in the expected state. Else false.
-     */
-    protected function requirements_fulfilled(int $userid): bool {
-        $this->update_question_id_to_question_bank_entry_id_if_required();
-
-        $attempts = quiz_get_user_attempts($this->quizid, $userid, 'finished', true);
-
-        if (count($attempts) > 0) {
-
-            if (class_exists('\\mod_quiz\\quiz_attempt')) {
-                $attemptobj = \mod_quiz\quiz_attempt::create(end($attempts)->id);
-            } else {
-                $attemptobj = \quiz_attempt::create(end($attempts)->id);
-            }
-
-            foreach ($attemptobj->get_slots() as $slot) {
-                $qa = $attemptobj->get_question_attempt($slot);
-                $question = \question_bank::load_question_data($qa->get_question_id());
-
-                if ($question->questionbankentryid == $this->questionbankentryid) {
-                    return $qa->get_state() === $this->requiredstate ||
-                            // If the teacher has manually graded, the state will acutally be something like
-                            // mangrright, so handle that case too by comparing CSS class strings.
-                            $qa->get_state()->get_feedback_class() === $this->requiredstate->get_feedback_class();
-                }
-            }
-        }
-
-        return false;
-    }
-
+    #[\Override]
     public function get_description($full, $not, \core_availability\info $info): string {
-        global $DB;
-        $this->update_question_id_to_question_bank_entry_id_if_required();
-
-        $quiz = $DB->get_record('quiz', ['id' => $this->quizid]);
-        $question = $DB->get_record_sql("
-                SELECT q.*
-                  FROM {question_bank_entries} qbe
-                  JOIN {question_versions} qv ON qv.questionbankentryid = qbe.id
-                            AND qv.version = (
-                                SELECT MAX(v.version)
-                                  FROM {question_versions} v
-                                 WHERE v.questionbankentryid = qbe.id
-                                   AND v.status <> ?)
-                  JOIN {question} q ON q.id = qv.questionid
-                 WHERE qbe.id = ?
-                ", [question_version_status::QUESTION_STATUS_DRAFT, $this->questionbankentryid], IGNORE_MISSING);
-
-        if ($quiz && $question) {
-            $a = [
-                'quizurl' => (new \moodle_url('/mod/quiz/view.php', ['q' => $quiz->id]))->out(),
-                'quizname' => format_string($quiz->name),
-                'questiontext' => shorten_text(\question_utils::to_plain_text($question->questiontext,
-                        $question->questiontextformat,
-                        ['noclean' => true, 'para' => false, 'filter' => false])),
-                'requiredstate' => $this->requiredstate->default_string(true),
-            ];
-            if ($not) {
-                return  get_string('requires_quizquestionnot', 'availability_quizgradeitem', $a);
-            } else {
-                return  get_string('requires_quizquestion', 'availability_quizgradeitem', $a);
-            }
+        if ($this->max === null) {
+            $string = 'min';
+        } else if ($this->min === null) {
+            $string = 'max';
+        } else {
+            $string = 'range';
         }
-
-        return '';
+        if ($not) {
+            $string = 'not' . $string;
+        }
+        return  get_string(
+            'requires_' . $string,
+            'availability_quizgradeitem',
+            [
+                'quizurl' => (new \moodle_url('/mod/quiz/view.php', ['q' => $this->quizid]))->out(),
+                'quizname' => $this->description_callback(['quizname', $this->quizid, '']),
+                'quizgradeitem' => $this->description_callback(['quizgradeitem', $this->quizid, $this->quizgradeitemid]),
+                'min' => $this->min ? $this->description_callback(['score', $this->quizid, $this->min]) : null,
+                'max' => $this->max ? $this->description_callback(['score', $this->quizid, $this->max]) : null,
+            ],
+        );
     }
 
     /**
-     * If this was set up under Moodle 3.x (that is, before upgrade, or from a backup)
-     * upgrade it now.
+     * Callback to get information needed in the display at the right time, and efficiently.
+     *
+     * This is sort-of defined in the base class, but for some reason we can't mark it an override.
+     *
+     * @param \course_modinfo $modinfo Modinfo
+     * @param \context $context Context
+     * @param string[] $params Parameters (just grade item id)
+     * @return string Text value
      */
-    protected function update_question_id_to_question_bank_entry_id_if_required(): void {
-        if ($this->questionbankentryid) {
-            // Nothing to do, really.
-            $this->questionid = null;
-            return;
+    public static function get_description_callback_value(
+        \course_modinfo $modinfo,
+        \context $context, // p---hpcs:ignore
+        array $params,
+    ): string {
+        if (count($params) !== 3) {
+            return '<!-- Invalid quizgradeitem description callback -->';
         }
+        [$type, $quizid, $value] = $params;
+        $cm = $modinfo->instances['quiz'][$quizid];
+        switch ($type) {
+            case 'quizname':
+                return $cm->get_formatted_name();
 
-        $questiondata = \question_bank::load_question_data($this->questionid);
-        $this->questionbankentryid = $questiondata->questionbankentryid;
-        $this->questionid = null;
+            case 'quizgradeitem':
+                $quizinfo = self::get_cached_quiz_info($modinfo, $quizid);
+                if (!$quizinfo) {
+                    return '<!-- Invalid quizgradeitem description callback -->';
+                }
+                $gradeitemnames = $quizinfo['gradeitemnames'];
+                // Return name from cached item or a lang string.
+                if (isset($gradeitemnames[$value])) {
+                    return format_string($gradeitemnames[$value]);
+                } else {
+                    return get_string('missinggradeitem', 'availability_quizgradeitem');
+                }
+
+            case 'score':
+                $quizinfo = self::get_cached_quiz_info($modinfo, $quizid);
+                if (!$quizinfo || $value === null) {
+                    return '<!-- Invalid quizgradeitem description callback -->';
+                }
+                return format_float($value, $quizinfo['decimalpoints']);
+
+            default:
+                return '<!-- Invalid quizgradeitem description callback -->';
+        }
     }
 
+    /**
+     * Obtains relevant data (for get_description_callback_value) for the quizzes in a course.
+     *
+     * Uses a cahse, which stores, for each course, we store an array
+     *   [
+     *     quizid => [
+     *       'decimalpoints' => 2,
+     *       'gradeitemnames' => [ id => name ],
+     *     ],
+     *   ]
+     *
+     * @param \course_modinfo $modinfo course id
+     * @param int $quizid quiz id
+     * @return array|null sufficent information about each quiz in the course, or null if not found.
+     */
+    protected static function get_cached_quiz_info(\course_modinfo $modinfo, int $quizid): ?array {
+        global $DB;
+
+        // Get all quiz grade item names from cache, or using db query.
+        $cache = \cache::make('availability_quizgradeitem', 'quizinfo');
+        $quizzesinfo = $cache->get($modinfo->courseid);
+        if ($quizzesinfo === false) {
+            $quizids = [];
+            foreach ($modinfo->get_instances_of('quiz') as $cm) {
+                $quizids[] = $cm->instance;
+            }
+
+            [$quizidcondition, $params] = $DB->get_in_or_equal($quizids, onemptyitems: '= 0');
+            $quizsettings = $DB->get_records_select_menu(
+                'quiz',
+                'id ' . $quizidcondition,
+                $params,
+                'id',
+                'id, decimalpoints',
+            );
+
+            $quizzesinfo = [];
+            foreach ($quizsettings as $id => $decimalpoints) {
+                $quizzesinfo[$id] = [
+                    'decimalpoints' => $decimalpoints,
+                    'gradeitemnames' => [],
+                ];
+            }
+
+            $gradeitems = $DB->get_records_select(
+                'quiz_grade_items',
+                'quizid ' . $quizidcondition,
+                $params,
+                'quizid, id',
+                'id, quizid, name',
+            );
+            foreach ($gradeitems as $gradeitem) {
+                $quizzesinfo[$gradeitem->quizid]['gradeitemnames'][$gradeitem->id] = $gradeitem->name;
+            }
+
+            $cache->set($modinfo->courseid, $quizzesinfo);
+        }
+
+        return $quizzesinfo[$quizid] ?? null;
+    }
+
+    /**
+     * Get the score for a given user on a given quiz grade item.
+     *
+     * Note that this score should not be displayed to
+     * the user, because review options might prohibit that.
+     *
+     * Uses caching internally.
+     *
+     * @param int $userid user we want the grad for.
+     * @param int $quizgradeitemid Quiz grade item ID we're interested in.
+     * @param int $quizid Quiz id
+     * @return float|null Grade score as a percentage in range 0-100 (e.g. 100.0
+     *   or 37.21), or false if user does not have a grade yet
+     */
+    protected static function get_cached_quiz_grade_item_score(
+        int $userid,
+        int $quizgradeitemid,
+        int $quizid,
+    ): ?float {
+        $cache = \cache::make('availability_quizgradeitem', 'scores');
+        $cachedgrades = $cache->get($userid);
+        if ($cachedgrades === false) {
+            $cachedgrades = [];
+        }
+        if (!isset($cachedgrades[$quizid])) {
+            $cachedgrades[$quizid] = self::load_grade_item_scores($userid, $quizid);
+            $cache->set($userid, $cachedgrades);
+        }
+
+        return $cachedgrades[$quizid][$quizgradeitemid] ?? null;
+    }
+
+    /**
+     * Compute the scores for each grade item for a students lastest attempt at a quiz.
+     *
+     * @param int $userid the user id
+     * @param int $quizid the quiz id
+     * @return array [ grade item id => float|null score ]
+     */
+    protected static function load_grade_item_scores(int $userid, int $quizid): array {
+        $attempts = quiz_get_user_attempts($quizid, $userid, 'finished', true);
+        if (!$attempts) {
+            return [];
+        }
+
+        $attemptobj = \mod_quiz\quiz_attempt::create(end($attempts)->id);
+
+        $scores = [];
+        foreach ($attemptobj->get_grade_item_totals() as $gradeitemid => $gradeoutof) {
+            $scores[$gradeitemid] = $gradeoutof->grade;
+        }
+
+        return $scores;
+    }
+
+    #[\Override]
     public function update_after_restore($restoreid, $courseid, \base_logger $logger, $name): bool {
         global $DB;
-
-        // Recode question bank entry id.
-        // If we don't find the new questionid, it is not ideal, but for
-        // now do nothing. The check below will probably generate a warning
-        // about the situation.
-        $questionidchanged = false;
-        if ($this->questionbankentryid) {
-            // Modern backup being restored.
-            $rec = \restore_dbops::get_backup_ids_record($restoreid, 'question_bank_entry', $this->questionbankentryid);
-            if ($rec && $rec->newitemid) {
-                // New question id found.
-                $this->questionbankentryid = (int) $rec->newitemid;
-                $questionidchanged = true;
-            }
-
-        } else {
-            // Restonrign 3.x backup. Work out questionbankentryid from old question id.
-            $rec = \restore_dbops::get_backup_ids_record($restoreid, 'question', $this->questionid);
-            if ($rec && $rec->newitemid) {
-                // New question id found.
-                $this->questionid = (int) $rec->newitemid;
-                $questionidchanged = true;
-
-                $this->update_question_id_to_question_bank_entry_id_if_required();
-            }
-        }
+        $changed = false;
 
         // Recode quiz id.
         $rec = \restore_dbops::get_backup_ids_record($restoreid, 'quiz', $this->quizid);
         if ($rec && $rec->newitemid) {
-            // New quiz id found.
+            // New quiz id found from the restore.
             $this->quizid = (int) $rec->newitemid;
-            return true;
+            $changed = true;
+        } else if (!$DB->record_exists('quiz', ['id' => $this->quizid, 'course' => $courseid])) {
+            $this->quizid = 0;
+            $changed = true;
+            $logger->process(
+                'Restored item (' . $name . ') has availability condition on a quiz that was not restored',
+                \backup::LOG_WARNING,
+            );
+        }
+        // Else we are on the same course (e.g. duplicate) and can just use the existing one.
+
+        // Recode quiz grade item id.
+        $rec = \restore_dbops::get_backup_ids_record($restoreid, 'quiz_grade_item', $this->quizgradeitemid);
+        if ($rec && $rec->newitemid) {
+            // New quiz grade item id found from the restore.
+            $this->quizgradeitemid = $rec->newitemid;
+            $changed = true;
+        } else if (!$DB->record_exists(
+            'quiz_grade_items',
+            ['id' => $this->quizgradeitemid, 'quizid' => $this->quizid],
+        )) {
+            $this->quizid = 0;
+            $changed = true;
+            $logger->process(
+                'Restored item (' . $name . ') has availability condition on a quiz grade item that was not restored',
+                \backup::LOG_WARNING,
+            );
         }
 
-        // If we are on the same course (e.g. duplicate) then we can just
-        // use the existing one.
-        if ($DB->record_exists('quiz',
-                ['id' => $this->quizid, 'course' => $courseid])) {
-            return $questionidchanged;
-        }
-
-        // Otherwise it's a warning.
-        $this->quizid = 0;
-        $logger->process('Restored item (' . $name .
-                ') has availability condition on module that was not restored',
-                \backup::LOG_WARNING);
-        return $questionidchanged;
+        return $changed;
     }
 }

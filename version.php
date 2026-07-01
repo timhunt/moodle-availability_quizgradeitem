@@ -29,3 +29,7 @@ $plugin->requires = 2025041400;
 $plugin->component = 'availability_quizgradeitem';
 $plugin->release = 'v0.9 for Moodle 5.0+';
 $plugin->maturity = MATURITY_BETA;
+
+$plugin->dependencies = [
+    'mod_quiz' => ANY_VERSION,
+];
