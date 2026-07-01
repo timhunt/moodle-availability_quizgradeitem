@@ -31,7 +31,7 @@ class frontend extends \core_availability\frontend {
     protected $allquizzescourseid;
 
     protected function get_javascript_strings(): array {
-        return ['label_gradeitem', 'label_min', 'label_max'];
+        return ['label_gradeitem', 'label_min', 'label_max', 'option_min', 'option_max'];
     }
 
     protected function get_javascript_init_params($course, \cm_info $cm = null,
