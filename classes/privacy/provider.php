@@ -28,7 +28,8 @@ namespace availability_quizgradeitem\privacy;
  * Restriction by quiz part score privacy subsystem implementation.
  */
 class provider implements \core_privacy\local\metadata\null_provider {
-    public static function get_reason() : string {
+    #[\Override]
+    public static function get_reason(): string {
         return 'privacy:metadata';
     }
 }

@@ -190,7 +190,7 @@ class condition extends \core_availability\condition {
      */
     public static function get_description_callback_value(
         \course_modinfo $modinfo,
-        \context $context, // p---hpcs:ignore
+        \context $context,
         array $params,
     ): string {
         if (count($params) !== 3) {
@@ -370,10 +370,12 @@ class condition extends \core_availability\condition {
             // New quiz grade item id found from the restore.
             $this->quizgradeitemid = $rec->newitemid;
             $changed = true;
-        } else if (!$DB->record_exists(
-            'quiz_grade_items',
-            ['id' => $this->quizgradeitemid, 'quizid' => $this->quizid],
-        )) {
+        } else if (
+            !$DB->record_exists(
+                'quiz_grade_items',
+                ['id' => $this->quizgradeitemid, 'quizid' => $this->quizid],
+            )
+        ) {
             $this->quizid = 0;
             $changed = true;
             $logger->process(

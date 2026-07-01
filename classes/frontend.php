@@ -30,13 +30,17 @@ class frontend extends \core_availability\frontend {
     /** @var int Course id that $allquizzes is for, use to avoid recomputing unless it changes. */
     protected $allquizzescourseid;
 
+    #[\Override]
     protected function get_javascript_strings(): array {
         return ['label_quiz', 'label_gradeitem', 'label_min', 'label_max', 'option_min', 'option_max'];
     }
 
-    protected function get_javascript_init_params($course, \cm_info $cm = null,
-            \section_info $section = null): array {
-
+    #[\Override]
+    protected function get_javascript_init_params(
+        $course,
+        \cm_info $cm = null,
+        \section_info $section = null
+    ): array {
         // Get all quizzes for course.
         $quizzes = $this->get_all_quizzes($course->id);
 
@@ -64,12 +68,16 @@ class frontend extends \core_availability\frontend {
                 }
             }
         }
+
         return $this->allquizzes;
     }
 
-    protected function allow_add($course, \cm_info $cm = null,
-            \section_info $section = null): bool {
-
+    #[\Override]
+    protected function allow_add(
+        $course,
+        \cm_info $cm = null,
+        \section_info $section = null
+    ): bool {
         // Only show this option if there are some quizzes in the course.
         return !empty($this->get_all_quizzes($course->id));
     }

@@ -28,8 +28,8 @@ use mod_quiz\quiz_settings;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(condition::class)]
-class condition_test extends \advanced_testcase {
-    public function test_constructor_min_only() {
+final class condition_test extends \advanced_testcase {
+    public function test_constructor_min_only(): void {
         $cond = new condition((object) [
             'quizid' => 123,
             'quizgradeitemid' => 456,
@@ -41,7 +41,7 @@ class condition_test extends \advanced_testcase {
         );
     }
 
-    public function test_constructor_max_only() {
+    public function test_constructor_max_only(): void {
         $cond = new condition((object) [
             'quizid' => 123,
             'quizgradeitemid' => 456,
@@ -53,7 +53,7 @@ class condition_test extends \advanced_testcase {
         );
     }
 
-    public function test_constructor_range() {
+    public function test_constructor_range(): void {
         $cond = new condition((object) [
             'quizid' => 123,
             'quizgradeitemid' => 456,
@@ -66,19 +66,19 @@ class condition_test extends \advanced_testcase {
         );
     }
 
-    public function test_constructor_invalid_quizid() {
+    public function test_constructor_invalid_quizid(): void {
         $this->expectExceptionMessage('Invalid quizid for quizgradeitem condition.');
         new condition((object) [
                 'quizid' => 'wrong', 'quizgradeitemid' => 456, 'min' => 2]);
     }
 
-    public function test_constructor_invalid_quizgradeitemid() {
+    public function test_constructor_invalid_quizgradeitemid(): void {
         $this->expectExceptionMessage('Invalid quizgradeitemid for quizgradeitem condition.');
         new condition((object) [
                 'quizid' => 123, 'quizgradeitemid' => 'wrong', 'min' => 2]);
     }
 
-    public function test_constructor_invalid_min() {
+    public function test_constructor_invalid_min(): void {
         $this->expectExceptionMessage('Invalid ->min for quizgradeitem condition.');
         new condition((object) [
             'quizid' => 123,
@@ -88,7 +88,7 @@ class condition_test extends \advanced_testcase {
         ]);
     }
 
-    public function test_constructor_invalid_max() {
+    public function test_constructor_invalid_max(): void {
         $this->expectExceptionMessage('Invalid ->max for quizgradeitem condition.');
         new condition((object) [
             'quizid' => 123,
@@ -98,7 +98,7 @@ class condition_test extends \advanced_testcase {
         ]);
     }
 
-    public function test_constructor_no_range() {
+    public function test_constructor_no_range(): void {
         $this->expectExceptionMessage('Either ->min or ->max must be set for a quizgradeitem condition.');
         new condition((object) [
             'quizid' => 123,
@@ -106,7 +106,7 @@ class condition_test extends \advanced_testcase {
         ]);
     }
 
-    public function test_save_min_only() {
+    public function test_save_min_only(): void {
         $structure = (object) [
             'quizid' => 123,
             'quizgradeitemid' => 456,
@@ -117,7 +117,7 @@ class condition_test extends \advanced_testcase {
         $this->assertEquals($structure, $cond->save());
     }
 
-    public function test_save_max_only() {
+    public function test_save_max_only(): void {
         $structure = (object) [
             'quizid' => 123,
             'quizgradeitemid' => 456,
@@ -128,7 +128,7 @@ class condition_test extends \advanced_testcase {
         $this->assertEquals($structure, $cond->save());
     }
 
-    public function test_save_range() {
+    public function test_save_range(): void {
         $structure = (object) [
             'quizid' => 123,
             'quizgradeitemid' => 456,
@@ -140,7 +140,7 @@ class condition_test extends \advanced_testcase {
         $this->assertEquals($structure, $cond->save());
     }
 
-    public function test_usage_range() {
+    public function test_usage_range(): void {
         [$student, $course, $quizobj] = $this->create_quiz_in_course_with_student();
         $structure = $quizobj->get_structure();
         $gradeitems = array_values($structure->get_grade_items());
@@ -185,7 +185,7 @@ class condition_test extends \advanced_testcase {
         );
     }
 
-    public function test_usage_min() {
+    public function test_usage_min(): void {
         [$student, $course, $quizobj] = $this->create_quiz_in_course_with_student();
         $structure = $quizobj->get_structure();
         $gradeitems = array_values($structure->get_grade_items());
@@ -236,6 +236,11 @@ class condition_test extends \advanced_testcase {
         );
     }
 
+    /**
+     * Create a common test setup.
+     *
+     * @return array [$student, $course, $quizobj]
+     */
     protected function create_quiz_in_course_with_student(): array {
         global $CFG;
         require_once($CFG->dirroot . '/availability/tests/fixtures/mock_info.php');
@@ -268,7 +273,14 @@ class condition_test extends \advanced_testcase {
         return [$student, $course, $quizobj];
     }
 
-    protected function attempt_quiz(quiz_settings $quizobj, \stdClass $student, bool $right) {
+    /**
+     * Create an attempt for a student at a quiz, assumes one numerical question.
+     *
+     * @param quiz_settings $quizobj
+     * @param \stdClass $student
+     * @param bool $right
+     */
+    protected function attempt_quiz(quiz_settings $quizobj, \stdClass $student, bool $right): void {
         $this->setUser($student);
         $attempt = $this->getDataGenerator()->get_plugin_generator('mod_quiz')
             ->create_attempt($quizobj->get_quizid(), $student->id);
