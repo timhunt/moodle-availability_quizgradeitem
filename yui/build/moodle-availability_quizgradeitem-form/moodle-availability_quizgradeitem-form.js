@@ -53,7 +53,7 @@ M.availability_quizgradeitem.form.getNode = function(json) {
     // Grading item
     html += '<label class="mb-3"><span class="pe-3">' + labelGradeItem + '</span> ' +
                 '<span class="availability-group">' +
-                '<select name="grateitemid" class="custom-select">' +
+                '<select name="gradeitemid" class="custom-select">' +
                     '<option value="0">' + chooseDots + '</option>';
     html += '</select></span></label><br>';
 
@@ -106,7 +106,7 @@ M.availability_quizgradeitem.form.getNode = function(json) {
                     }
                 }])[0]
                     .then(function(results) {
-                        var gradeItems = results.gradeitems;
+                        var gradeItems = JSON.parse(results).gradeitems;
                         for (var i = 0; i < gradeItems.length; i++) {
                             var gradeItemOption = document.createElement('option');
                             gradeItemOption.value = gradeItems[i].id;
@@ -163,9 +163,9 @@ M.availability_quizgradeitem.form.getNode = function(json) {
             M.core_availability.form.update();
         }, '.availability_quizgradeitem select');
         root.delegate('change', function() {
-            var ancestorNode = this.ancestor('span.availability_quizgradeitem');
+            var ancestorNode = this.ancestor('div.availability_quizgradeitem');
             var quizNode = ancestorNode.one('select[name=quizid]');
-            var questionNode = ancestorNode.one('select[name=questionbankentryid]');
+            var questionNode = ancestorNode.one('select[name=gradeitemid]');
             updateGradeItems(quizNode, questionNode);
         }, '.availability_quizgradeitem select[name=quizid]');
         root.delegate('click', function() {
