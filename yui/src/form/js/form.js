@@ -81,7 +81,7 @@ M.availability_quizgradeitem.form.getNode = function(json) {
 
     var node = Y.Node.create('<div class="d-inline-block d-flex flex-column w-100">' + html + '</div>');
 
-    var updateGradeItems = function(quizNode, gradeItemNode, callback) {
+    var updateGradeItems = function(quizNode, gradeItemNode, selectGradeId) {
         var quizId = quizNode.get('value');
 
         // Remove the existing options.
@@ -111,15 +111,19 @@ M.availability_quizgradeitem.form.getNode = function(json) {
                             gradeItemOption.innerHTML = gradeItems[i].displayname;
                             gradeItemNode.append(gradeItemOption);
                         }
-                        // Grade items are loaded, so we enable the quiz element now.
+                        // Grade items are loaded, so re-enable the quiz element now.
                         quizNode.set('disabled', false);
 
-                        if (callback !== undefined) {
-                            callback();
+                        if (
+                            selectGradeId !== undefined &&
+                            node.one('select[name=questionbankentryid] > option[value=' + json.questionbankentryid + ']')
+                        ) {
+                            node.one('select[name=questionbankentryid]').set('value', '' + json.questionbankentryid);
                         }
 
                         M.core_availability.form.update();
                         M.util.js_complete(pendingKey);
+                        return;
                     }).catch(notification.exception);
             });
         }
@@ -129,16 +133,11 @@ M.availability_quizgradeitem.form.getNode = function(json) {
     if (json.quizid !== undefined &&
             node.one('select[name=quizid] > option[value=' + json.quizid + ']')) {
         node.one('select[name=quizid]').set('value', '' + json.quizid);
-        updateGradeItems(node.one('select[name=quizid]'), node.one('select[name=questionbankentryid]'), function() {
-            if (json.questionbankentryid !== undefined &&
-                node.one('select[name=questionbankentryid] > option[value=' + json.questionbankentryid + ']')) {
-                node.one('select[name=questionbankentryid]').set('value', '' + json.questionbankentryid);
-            }
-        });
-    }
-    if (json.requiredstate !== undefined &&
-            node.one('select[name=requiredstate] > option[value=' + json.requiredstate + ']')) {
-        node.one('select[name=requiredstate]').set('value', '' + json.requiredstate);
+        updateGradeItems(
+            node.one('select[name=quizid]'),
+            node.one('select[name=questionbankentryid]'),
+            json.questionbankentryid
+        );
     }
 
     // Disables/enables text input fields depending on checkbox.
