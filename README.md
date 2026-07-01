@@ -6,10 +6,11 @@ Teachers can create rules based on the percentage of marks achieved in a section
 
 The condition integrates with Moodle's standard availability API and appears alongside the other restrict access conditions.
 
+Also: The condition takes the last attempt of a quiz if multiple attempts are allowed.
+
 ## Note! ## 
 
 "Grade item" here refers to grade items set in the Quiz activity. These grade items are not set or do not appear in the gradebook. See <https://docs.moodle.org/502/en/Building_Quiz#Quiz_section_grades> for details.
-
 
 
 ## To install ##
