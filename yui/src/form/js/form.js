@@ -18,7 +18,7 @@ M.availability_quizgradeitem.form.quizzes = null;
  * @property states
  * @type Array
  */
-M.availability_quizgradeitem.form.states = null;
+// M.availability_quizgradeitem.form.states = null;
 
 /**
  * Initialises this plugin.
@@ -27,45 +27,77 @@ M.availability_quizgradeitem.form.states = null;
  * @param {Array} quizzes Array of objects containing quiz .id and .name
  * @param {Array} states Array of objects containing state .shortname and .displayname
  */
-M.availability_quizgradeitem.form.initInner = function(quizzes, states) {
+M.availability_quizgradeitem.form.initInner = function(quizzes) {
     this.quizzes = quizzes;
-    this.states = states;
+    window.console.log(quizzes);
+    // this.states = states;
 };
 
 M.availability_quizgradeitem.form.getNode = function(json) {
-    var i;
+    // Init variables
+    var i = 0;
+    var html = '<br>';
 
-    // Create HTML structure.
-    var html = '<span class="availability-group">';
-    html += '<label><span class="p-r-1">' + M.util.get_string('title', 'availability_quizgradeitem') + '</span> ' +
-            '<select name="quizid" class="custom-select">' +
-            '<option value="">' + M.util.get_string('choosedots', 'moodle') + '</option>';
+    // Get strings
+    var title = M.util.get_string('title', 'availability_quizgradeitem');
+    var label_gradeitem = M.util.get_string('label_gradeitem', 'availability_quizgradeitem');
+    var choosedots = M.util.get_string('choosedots', 'moodle');
+    var option_min = M.util.get_string('option_min', 'availability_quizgradeitem');
+    var label_min = M.util.get_string('label_min', 'availability_quizgradeitem');
+    var option_max = M.util.get_string('option_max', 'availability_quizgradeitem');
+    var label_max = M.util.get_string('label_max', 'availability_quizgradeitem');
+
+    // Quizzes
+    html += '<label class="mb-3"><span class="pe-3">' + title + '</span> ' +
+                '<span class="availability-group">' +
+                '<select name="quizid" class="custom-select">' +
+                    '<option value="0">' + choosedots + '</option>';
     for (i = 0; i < this.quizzes.length; i++) {
         // String has already been escaped using format_string.
         html += '<option value="' + this.quizzes[i].id + '">' + this.quizzes[i].name + '</option>';
     }
-    html += '</select></label>';
+    html += '</select></span></label><br>';
 
-    html += ' <label><span class="sr-only">' + M.util.get_string('label_question', 'availability_quizgradeitem') + '</span>' +
-            '<select name="questionbankentryid" class="custom-select">' +
-            '<option value="">' + M.util.get_string('choosedots', 'moodle') + '</option>';
-    html += '</select></label>';
-
-    html += ' <label><span class="sr-only">' + M.util.get_string('label_state', 'availability_quizgradeitem') + '</span>' +
-            '<select name="requiredstate" class="custom-select">' +
-            '<option value="">' + M.util.get_string('choosedots', 'moodle') + '</option>';
-    for (i = 0; i < this.states.length; i++) {
-        html += '<option value="' + this.states[i].shortname + '">' + this.states[i].displayname + '</option>';
+    // Grading categories
+    html += '<label class="mb-3"><span class="pe-3">' + label_gradeitem + '</span> ' +
+                '<span class="availability-group">' +
+                '<select name="quizid" class="custom-select">' +
+                    '<option value="0">' + choosedots + '</option>';
+    for (i = 0; i < this.quizzes.length; i++) {
+        // String has already been escaped using format_string.
+        html += '<option value="' + this.quizzes[i].id + '">' + this.quizzes[i].name + '</option>';
     }
-    html += '</select></label>';
+    html += '</select></span></label><br>';
 
-    html += '</span>';
+    // Min
+    html += '<span class="availability-group mb-3">' +
+                '<label><input type="checkbox" class="form-check-input position-static mt-0 mx-1" name="max"/>' +
+                    option_min +
+                '</label>' +
+                '<label>' +
+                    '<span class="accesshide">' + label_min + '</span>' +
+                    '<input type="text" class="form-control mx-1" name="minval" title="' + label_min + '"/>' +
+                '</label>' +
+            ' %</span>' +
+            '<br>';
 
-    var node = Y.Node.create('<span class="form-inline">' + html + '</span>');
+    // Max
+    html += '<span class="availability-group mb-3">' +
+                '<label><input type="checkbox" class="form-check-input position-static mt-0 mx-1" name="max"/>' +
+                    option_max +
+                '</label>' +
+                '<label>' +
+                    '<span class="accesshide">' + label_max + '</span>' +
+                    '<input type="text" class="form-control mx-1" name="minval" title="' + label_max + '"/>' +
+                '</label>' +
+            ' %</span>'+
+            '<br>';
+
+    var node = Y.Node.create('<div class="d-inline-block d-flex flex-wrap align-items-center">' + html + '</div>');
 
     var updateQuestions = function(quizNode, questionNode, callback) {
         var quizId = quizNode.get('value');
-        var url = M.cfg.wwwroot + '/availability/condition/quizquestion/ajax.php?quizid=' + quizId;
+        var url = M.cfg.wwwroot + '/availability/condition/quizgradeitem/ajax.php?quizid=' + quizId;
         // First, remove all options except the first one from the question drop-down menu.
         questionNode.all('option').each(function(optionNode) {
             if (optionNode.get('value') !== '') {
@@ -130,6 +162,18 @@ M.availability_quizgradeitem.form.getNode = function(json) {
         node.one('select[name=requiredstate]').set('value', '' + json.requiredstate);
     }
 
+    // Disables/enables text input fields depending on checkbox.
+    var updateCheckbox = function(check, focus) {
+        var input = check.ancestor('label').next('label').one('input');
+        var checked = check.get('checked');
+        input.set('disabled', !checked);
+        if (focus && checked) {
+            input.focus();
+        }
+        return checked;
+    };
+    node.all('input[type=checkbox]').each(updateCheckbox);
+
     // Add event handlers (first time only).
     if (!M.availability_quizgradeitem.form.addedEvents) {
         M.availability_quizgradeitem.form.addedEvents = true;
@@ -143,6 +187,10 @@ M.availability_quizgradeitem.form.getNode = function(json) {
             var questionNode = ancestorNode.one('select[name=questionbankentryid]');
             updateQuestions(quizNode, questionNode);
         }, '.availability_quizgradeitem select[name=quizid]');
+        root.delegate('click', function() {
+            updateCheckbox(this, true);
+            M.core_availability.form.update();
+        }, '.availability_quizgradeitem input[type=checkbox]');
     }
 
     return node;
@@ -150,12 +198,12 @@ M.availability_quizgradeitem.form.getNode = function(json) {
 
 M.availability_quizgradeitem.form.fillValue = function(value, node) {
     var quizid = node.one('select[name=quizid]').get('value');
-    var questionbankentryid = node.one('select[name=questionbankentryid]').get('value');
-    var state = node.one('select[name=requiredstate]').get('value');
+    // var questionbankentryid = node.one('select[name=questionbankentryid]').get('value');
+    // var state = node.one('select[name=requiredstate]').get('value');
 
     value.quizid = quizid === '' ? '' : parseInt(quizid, 10);
-    value.questionbankentryid = questionbankentryid === '' ? '' : parseInt(questionbankentryid, 10);
-    value.requiredstate = state;
+    // value.questionbankentryid = questionbankentryid === '' ? '' : parseInt(questionbankentryid, 10);
+    // value.requiredstate = state;
 };
 
 M.availability_quizgradeitem.form.fillErrors = function(errors, node) {
