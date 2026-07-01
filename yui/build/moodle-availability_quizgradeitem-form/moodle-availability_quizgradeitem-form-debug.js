@@ -15,7 +15,7 @@ M.availability_quizgradeitem.form = Y.Object(M.core_availability.plugin);
 M.availability_quizgradeitem.form.quizzes = null;
 
 /**
- * Initialises this plugin.
+ * Initialise this plugin.
  *
  * @method initInner
  * @param {Array} quizzes Array of objects containing quiz .id and .name
@@ -30,8 +30,8 @@ M.availability_quizgradeitem.form.getNode = function(json) {
     var i;
     var html = '<br>';
 
-    // Get strings
-    var title = M.util.get_string('title', 'availability_quizgradeitem');
+    // Get strings.
+    var labelQuiz = M.util.get_string('label_quiz', 'availability_quizgradeitem');
     var labelGradeItem = M.util.get_string('label_gradeitem', 'availability_quizgradeitem');
     var chooseDots = M.util.get_string('choosedots', 'moodle');
     var optionMin = M.util.get_string('option_min', 'availability_quizgradeitem');
@@ -39,8 +39,8 @@ M.availability_quizgradeitem.form.getNode = function(json) {
     var optionMax = M.util.get_string('option_max', 'availability_quizgradeitem');
     var labelMax = M.util.get_string('label_max', 'availability_quizgradeitem');
 
-    // Quizzes
-    html += '<label class="mb-3"><span class="pe-3">' + title + '</span> ' +
+    // Quizzes.
+    html += '<label class="mb-3"><span class="pe-3">' + labelQuiz + '</span> ' +
                 '<span class="availability-group">' +
                 '<select name="quizid" class="custom-select">' +
                     '<option value="0">' + chooseDots + '</option>';
@@ -50,14 +50,14 @@ M.availability_quizgradeitem.form.getNode = function(json) {
     }
     html += '</select></span></label><br>';
 
-    // Grading item
+    // Grade item.
     html += '<label class="mb-3"><span class="pe-3">' + labelGradeItem + '</span> ' +
                 '<span class="availability-group">' +
                 '<select name="grateitemid" class="custom-select">' +
                     '<option value="0">' + chooseDots + '</option>';
     html += '</select></span></label><br>';
 
-    // Min
+    // Min.
     html += '<span class="availability-group mb-3">' +
                 '<label><input type="checkbox" class="form-check-input position-static mt-0 mx-1" name="max"/>' +
                     optionMin +
@@ -69,7 +69,7 @@ M.availability_quizgradeitem.form.getNode = function(json) {
             ' %</span>' +
             '<br>';
 
-    // Max
+    // Max.
     html += '<span class="availability-group mb-3">' +
                 '<label><input type="checkbox" class="form-check-input position-static mt-0 mx-1" name="max"/>' +
                     optionMax +
@@ -113,7 +113,7 @@ M.availability_quizgradeitem.form.getNode = function(json) {
                             gradeItemOption.innerHTML = gradeItems[i].displayname;
                             gradeItemNode.append(gradeItemOption);
                         }
-                        // Questions are loaded, so we enable the quiz element now.
+                        // Grade items are loaded, so we enable the quiz element now.
                         quizNode.set('disabled', false);
 
                         if (callback !== undefined) {

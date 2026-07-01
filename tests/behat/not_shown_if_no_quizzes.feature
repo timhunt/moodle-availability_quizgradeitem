@@ -19,7 +19,7 @@ Feature: Restriction by quiz part score only shows when relevant
   Scenario: If there are no quizzes in the course, this condition should not appear.
     Given I am on the "C1" "Course" page logged in as "teacher"
     And I turn editing mode on
-    When I add a "Page" to section "1"
+    When I add a page activity to course "Study skills" section 1
     And I expand all fieldsets
     And I click on "Add restriction..." "button"
-    Then "Quiz question" "button" should not exist in the "Add restriction..." "dialogue"
+    Then "Quiz part grade" "button" should not exist in the "Add restriction..." "dialogue"

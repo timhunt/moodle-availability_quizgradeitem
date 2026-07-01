@@ -34,6 +34,7 @@ $string['error_selectquiz'] = 'You must select a quiz.';
 $string['label_gradeitem'] = 'Which part grade';
 $string['label_max'] = 'Maximum grade percentage (exclusive)';
 $string['label_min'] = 'Minimum grade percentage (inclusive)';
+$string['label_quiz'] = 'Quiz';
 $string['missinggradeitem'] = '(missing grade item)';
 $string['option_max'] = 'must be <';
 $string['option_min'] = 'must be ≥';
