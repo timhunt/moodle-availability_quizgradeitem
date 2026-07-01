@@ -93,7 +93,7 @@ M.availability_quizgradeitem.form.getNode = function(json) {
             ' %</span>'+
             '<br>';
 
-    var node = Y.Node.create('<div class="d-inline-block d-flex flex-wrap align-items-center">' + html + '</div>');
+    var node = Y.Node.create('<div class="d-inline-block d-flex flex-column w-100">' + html + '</div>');
 
     var updateQuestions = function(quizNode, questionNode, callback) {
         var quizId = quizNode.get('value');
