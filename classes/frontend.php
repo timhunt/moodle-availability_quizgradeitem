@@ -27,11 +27,11 @@ class frontend extends \core_availability\frontend {
     /** @var array Array of quiz info for course */
     protected $allquizzes;
 
-    /** @var int Course id that $allquizzes is for */
+    /** @var int Course id that $allquizzes is for, use to avoid recomputing unless it changes. */
     protected $allquizzescourseid;
 
     protected function get_javascript_strings(): array {
-        return ['label_state', 'label_question', 'ajaxerror'];
+        return ['label_gradeitem', 'label_min', 'label_max'];
     }
 
     protected function get_javascript_init_params($course, \cm_info $cm = null,
@@ -40,16 +40,8 @@ class frontend extends \core_availability\frontend {
         // Get all quizzes for course.
         $quizzes = $this->get_all_quizzes($course->id);
 
-        // Get the possible expected states.
-        $states = [
-            'gradedright' => get_string('correct', 'quiz'),
-            'gradedpartial' => get_string('partiallycorrect', 'quiz'),
-            'gradedwrong' => get_string('incorrect', 'quiz'),
-        ];
-
         return [
             array_values($quizzes),
-            self::convert_associative_array_for_js($states, 'shortname', 'displayname'),
         ];
     }
 
@@ -60,6 +52,7 @@ class frontend extends \core_availability\frontend {
      * @return array Array objects with fields id and name (which has been formatted with format_string.
      */
     protected function get_all_quizzes(int $courseid): array {
+        // TODO limit to quizzes with grade items.
         if ($courseid != $this->allquizzescourseid) {
             $this->allquizzes = [];
             $modinfo = get_fast_modinfo($courseid);
