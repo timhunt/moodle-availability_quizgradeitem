@@ -260,10 +260,8 @@ final class condition_test extends \advanced_testcase {
         $quiz = $generator->create_module('quiz', ['course' => $course->id]);
         /** @var \core_question_generator $questiongenerator */
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
-        $category = $questiongenerator->create_question_category(
-            ['contextid' => $context->id]);
-        $question = $questiongenerator->create_question('numerical', null,
-            ['category' => $category->id]);
+        $category = $questiongenerator->create_question_category(['contextid' => $context->id]);
+        $question = $questiongenerator->create_question('numerical', null, ['category' => $category->id]);
         $question = \question_bank::load_question_data($question->id); // Reload to get questionbankentryid.
         quiz_add_quiz_question($question->id, $quiz);
         $quizobj = \mod_quiz\quiz_settings::create($quiz->id, $student->id);

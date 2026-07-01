@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Cache definitions.
  *
@@ -21,7 +23,6 @@
  * @copyright 2026 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 $definitions = [
     // Used to cache the necessary info about quizzes in a particular course.
     // Keys course id. Value structure documented in the PHPdoc for

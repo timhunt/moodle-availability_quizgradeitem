@@ -62,9 +62,10 @@ class frontend extends \core_availability\frontend {
             $modinfo = get_fast_modinfo($courseid);
             foreach ($modinfo->get_instances_of('quiz') as $cm) {
                 if (has_capability('mod/quiz:viewreports', \context_module::instance($cm->id))) {
-                    $this->allquizzes[] = (object) ['id' => $cm->instance,
-                            'name' => format_string($cm->name, true,
-                                    ['context' => \context_module::instance($cm->id)])];
+                    $this->allquizzes[] = (object) [
+                        'id' => $cm->instance,
+                        'name' => format_string($cm->name, true, ['context' => \context_module::instance($cm->id)]),
+                    ];
                 }
             }
         }
